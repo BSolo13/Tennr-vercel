@@ -9,7 +9,7 @@ export const runtime = 'edge'
 
 const configuration = new Configuration({
   //apiKey: 'ASStn8eNtkg87W5wemGhcMfOPxJ8/hyVaabGZ0tmsj8=' local version
-  apiKey: 'gv8pzQgsLyTInP4mO02VSkMdA0zxsL97iRkAMw33NRU='
+  apiKey: process.env.TENNR_API_KEY
 })
 
 const openai = new OpenAIApi(configuration)
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `api-key gv8pzQgsLyTInP4mO02VSkMdA0zxsL97iRkAMw33NRU=`
+        Authorization: `api-key ${process.env.TENNR_API_KEY}` //gv8pzQgsLyTInP4mO02VSkMdA0zxsL97iRkAMw33NRU=`
       },
       body: JSON.stringify({
         agentId: agentId,
