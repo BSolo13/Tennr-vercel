@@ -53,7 +53,7 @@ export async function POST(req: Request) {
     })
 
     let responseStream
-    if (false) {
+    if (streamIt) {
       const responseText = await response.text()
 
       const messageArr = responseText
