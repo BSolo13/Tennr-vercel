@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { toast } from 'react-hot-toast'
@@ -48,12 +48,50 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         }
       }
     })
+
+  //Start of new content
+  const [animatedMessages, setAnimatedMessages] = useState<Message[]>([])
+
+  useEffect(() => {
+    if (messages.length > animatedMessages.length) {
+      // New message is added
+      const newMessage = messages[messages.length - 1]
+      if (newMessage.role === 'assistant') {
+        // If new message is from assistant, animate it
+        let i = 0
+        const intervalId = setInterval(() => {
+          if (i < newMessage.content.length) {
+            const newAnimatedMessages = [
+              ...animatedMessages,
+              {
+                ...newMessage,
+                content: newMessage.content.slice(0, i + 1)
+              }
+            ]
+            setAnimatedMessages(newAnimatedMessages)
+            i++
+          } else {
+            clearInterval(intervalId)
+          }
+        }, 10) // Adjust this value to increase or decrease typing speed
+      } else {
+        // If new message is from user, just append it
+        setAnimatedMessages([...animatedMessages, newMessage])
+      }
+    } else if (messages.length < animatedMessages.length) {
+      // Some messages are removed
+      setAnimatedMessages(messages)
+    }
+  }, [messages])
+  //End of new content
+
   return (
     <>
       <div className={cn('pb-[200px] pt-4 md:pt-10', className)}>
         {messages.length ? (
           <>
-            <ChatList messages={messages} />
+            {/* was messages  */}
+            <ChatList messages={animatedMessages} />
             <ChatScrollAnchor trackVisibility={isLoading} />
           </>
         ) : (
@@ -66,7 +104,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         stop={stop}
         append={append}
         reload={reload}
-        messages={messages}
+        messages={animatedMessages} //was messages
         input={input}
         setInput={setInput}
       />

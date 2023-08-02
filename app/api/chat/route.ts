@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     const agentId = '644b3fbae8f5dfe23bd06482'
     //const agentUrl = 'http://localhost:4000' local version
     const agentUrl = 'https://agent.tennr.com'
-    var streamIt = false
+    var streamIt = true
 
     const response = await fetch(agentUrl + '/api/v1/workflow/run', {
       method: 'POST',
@@ -68,11 +68,14 @@ export async function POST(req: Request) {
         .replace(/{"sources":\[.*\]}/, '')
         .trim()
 
-      responseStream = arrayToStream([cleanedMessages])
+      const processedMessages = createWordArray(cleanedMessages)
+      responseStream = arrayToStream(processedMessages)
+      console.log('final product for streaming: ', processedMessages)
     } else {
       const responseJson = JSON.parse(await response.text())
       const outputText = responseJson.output // Extract the output text.
       responseStream = stringToStream(outputText)
+      console.log('Final product for non-streaming: ', outputText)
     }
 
     return new StreamingTextResponse(responseStream)
@@ -105,4 +108,9 @@ function arrayToStream(array: string[]) {
       }
     }
   })
+}
+
+function createWordArray(text: string): string[] {
+  const wordArray = text.split(' ')
+  return wordArray
 }
